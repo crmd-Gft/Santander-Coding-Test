@@ -1,18 +1,16 @@
-﻿using System;
-using System.Globalization;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 public class Story
 {
     [JsonProperty("title")]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [JsonProperty("url")]
-    public string Uri { get; set; }
+    public string? Uri { get; set; }
 
     [JsonProperty("by")]
-    public string PostedBy { get; set; }
+    public string? PostedBy { get; set; }
 
     [JsonConverter(typeof(UnixDateTimeConverter))]
     public DateTime Time { get; set; }

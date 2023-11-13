@@ -20,7 +20,7 @@
             {
                 var response = await _httpClient.GetStringAsync("https://hacker-news.firebaseio.com/v0/beststories.json");
                 var storyIds = JsonConvert.DeserializeObject<IEnumerable<int>>(response);
-                return storyIds.Take(n);
+                return storyIds?.Take(n) ?? Enumerable.Empty<int>();
             }
             catch (Exception e)
             {
@@ -33,7 +33,7 @@
             try
             {
                 var response = await _httpClient.GetStringAsync($"https://hacker-news.firebaseio.com/v0/item/{storyId}.json");
-                var story = JsonConvert.DeserializeObject<Story>(response);
+                var story = JsonConvert.DeserializeObject<Story>(response) ?? throw new BadHttpRequestException($"No story at {storyId}");
                 return story;
             }
             catch(Exception e)
