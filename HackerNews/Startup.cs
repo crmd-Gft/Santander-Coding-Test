@@ -12,7 +12,11 @@
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpClient<HackerNewsService>();
+            services.AddTransient<IHackerNewsService, HackerNewsService>();
+            services.AddHttpClient<HackerNewsService>("HackerNewsClient", c =>
+            {
+                c.BaseAddress = new Uri(Configuration.GetValue<string>("HackerNewsApi"));
+            });
             services.AddControllers();
         }
 

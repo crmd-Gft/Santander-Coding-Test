@@ -3,22 +3,24 @@
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Caching.Memory;
     using Newtonsoft.Json;
 
-    public class HackerNewsService
+    public class HackerNewsService : IHackerNewsService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public HackerNewsService(HttpClient httpClient)
+        public HackerNewsService(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<IEnumerable<int>> GetBestStoryIdsAsync(int n)
         {
             try
             {
-                var response = await _httpClient.GetStringAsync("https://hacker-news.firebaseio.com/v0/beststories.json");
+                var httpClient = _httpClientFactory.CreateClient("HackerNewsClient");
+                var response = await httpClient.GetStringAsync("beststories.json");
                 var storyIds = JsonConvert.DeserializeObject<IEnumerable<int>>(response);
                 return storyIds?.Take(n) ?? Enumerable.Empty<int>();
             }
@@ -32,15 +34,15 @@
         {
             try
             {
-                var response = await _httpClient.GetStringAsync($"https://hacker-news.firebaseio.com/v0/item/{storyId}.json");
+                var httpClient = _httpClientFactory.CreateClient("HackerNewsClient");
+                var response = await httpClient.GetStringAsync($"item/{storyId}.json");
                 var story = JsonConvert.DeserializeObject<Story>(response) ?? throw new BadHttpRequestException($"No story at {storyId}");
                 return story;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new Exception($"Error fetching details for story ID {storyId} from Hacker News API.", e);
             }
-
         }
     }
 
